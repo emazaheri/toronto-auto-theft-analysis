@@ -8,6 +8,9 @@ __pycache__/
 *.pyo
 *.pyd
 
+# --- Build artifacts and packaging metadata ---
+*.egg-info/
+
 # IDEs and editors
 .vscode/
 .idea/

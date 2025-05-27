@@ -1,0 +1,23 @@
+# Virtual Environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+
+# Build artifacts and outputs
+/report/*.html
+/report/*.pdf
+/data/01_processed/*
+!/data/01_processed/.gitkeep
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/

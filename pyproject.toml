@@ -1,0 +1,74 @@
+[project]
+name = "toronto-auto-theft-analysis"
+version = "0.1.0"
+description = "An analysis of Toronto auto theft data with census demographics."
+authors = [{ name = "Ehsan Mazaheri", email = "ehsanmzht@gmail.com" }]
+requires-python = ">=3.10"
+
+# --- Core dependencies required for the project's logic to run ---
+dependencies = [
+    "pandas",
+    "geopandas",
+    "pyarrow",
+]
+
+# --- dependencies for development, visualization, and the app ---
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "dvc[gdrive]", # For data versioning
+    "pre-commit",  # For running checks automatically before commits
+    "pytest",      # For testing
+]
+viz = [
+    "plotly",
+    "matplotlib",
+    "seaborn",
+]
+app = [
+    "streamlit",
+]
+
+[tool.ruff]
+# Assume all files are Python 3.10+
+target-version = "py310"
+line-length = 88
+
+# Exclude common folders from linting
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".svn",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Select a more comprehensive set of rules for higher code quality
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort (import sorting)
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear (finds likely bugs)
+    "C4", # flake8-comprehensions (encourages pythonic comprehensions)
+    "D",  # pydocstyle (enforces docstrings)
+    "SIM",# flake8-simplify (simplifies code)
+    "TCH",# flake8-type-checking (helps manage type hint imports)
+]
+
+# ignore = []
+
+[tool.ruff.lint.pydocstyle]
+# Use the Google docstring convention (common and readable)
+convention = "google"
+
+[tool.ruff.lint.isort]
+# Tell isort that 'src' is our own code, to group imports properly
+known-first-party = ["src"]

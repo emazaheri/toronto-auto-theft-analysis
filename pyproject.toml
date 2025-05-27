@@ -16,7 +16,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff",
-    "dvc[gdrive]", # For data versioning
+    "dvc[s3]", # For data versioning
+    "awscli", # For AWS CLI commands
     "pre-commit",  # For running checks automatically before commits
     "pytest",      # For testing
 ]

@@ -8,7 +8,8 @@ __pycache__/
 *.pyo
 *.pyd
 
-# --- Build artifacts and packaging metadata ---
+# Build artifacts and packaging metadata
+/build/
 *.egg-info/
 
 # IDEs and editors

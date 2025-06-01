@@ -6,4 +6,6 @@ and transforming raw data into a format suitable for analysis.
 Classes:
     AutoTheftTransformer: Cleans and transforms auto theft data
                           with cleaning, validation, and feature engineering
+    CensusTransformer: Cleans and transforms Canada Census 2021 data
+                       with hierarchy detection and filtering capabilities
 """

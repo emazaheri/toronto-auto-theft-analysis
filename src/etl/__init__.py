@@ -8,5 +8,6 @@ Modules:
     extractors: Data extraction from raw sources
     transformers: Data cleaning, validation, and feature engineering
     loaders: Data storage in processed formats
-    auto_theft_pipeline: Main ETL pipeline orchestration
+    auto_theft_pipeline: Main ETL pipeline orchestration for auto theft data
+    census_pipeline: ETL pipeline orchestration for Canada Census 2021 data
 """

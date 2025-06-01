@@ -12,6 +12,36 @@ DATA_DIR = ROOT_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "00_raw"
 PROCESSED_DATA_DIR = DATA_DIR / "01_processed"
 
+# Configuration for joined data pipeline
+JOINED_DATA_CONFIG = {
+    # Will be set in the joined_data_pipeline.py to avoid circular imports
+}
+
+# Census data configuration
+CENSUS_CONFIG = {
+    "geo_input_path": RAW_DATA_DIR / "census_2021_geo.csv",
+    "data_input_path": RAW_DATA_DIR / "census_2021.csv",
+    "output_path": PROCESSED_DATA_DIR / "census_2021_processed.parquet",
+    "column_dtypes": {
+        "DGUID": "category",
+        "ALT_GEO_CODE": "object",
+        "CHARACTERISTIC_ID": "category",
+        "CHARACTERISTIC_NAME": "object",
+        "CHARACTERISTIC_NOTE": "Int16",
+        "DATA_QUALITY_FLAG": "category",
+        "TNR_SF": "float32",
+        "TNR_LF": "float32",
+    },
+    "columns_to_drop": [
+        "CENSUS_YEAR",
+        "GEO_LEVEL",
+        "GEO_NAME",
+    ],
+    "fsa_prefix": "M",  # Toronto FSAs start with "M"
+    "encoding": "latin1",
+    "max_characteristic_level": 4,  # Filter characteristics up to this level
+}
+
 # Auto theft data configuration
 AUTO_THEFT_CONFIG = {
     "input_path": RAW_DATA_DIR / "auto_theft.csv",

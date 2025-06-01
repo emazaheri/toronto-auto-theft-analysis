@@ -5,4 +5,5 @@ into various storage formats, particularly optimized parquet files.
 
 Classes:
     AutoTheftLoader: Loads processed auto theft data into parquet files
+    CensusLoader: Loads processed Canada Census 2021 data into parquet files
 """

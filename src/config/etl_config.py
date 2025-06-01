@@ -17,6 +17,15 @@ JOINED_DATA_CONFIG = {
     # Will be set in the joined_data_pipeline.py to avoid circular imports
 }
 
+# Geospatial data configuration
+GEOSPATIAL_CONFIG = {
+    "hood_input_path": RAW_DATA_DIR / "neighbourhoods_158.geojson",
+    "fsa_input_path": RAW_DATA_DIR / "toronto_fsa.geojson",
+    "output_path": PROCESSED_DATA_DIR / "toronto_hoods_fsa_overlap.parquet",
+    "crs": "EPSG:3347",  # Equal area projection for accurate area calculations
+    "min_overlap_percent": 0.001,  # Minimum overlap threshold (0.1%)
+}
+
 # Census data configuration
 CENSUS_CONFIG = {
     "geo_input_path": RAW_DATA_DIR / "census_2021_geo.csv",

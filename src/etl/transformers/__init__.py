@@ -8,4 +8,6 @@ Classes:
                           with cleaning, validation, and feature engineering
     CensusTransformer: Cleans and transforms Canada Census 2021 data
                        with hierarchy detection and filtering capabilities
+    GeospatialTransformer: Transforms geospatial data for FSA and neighbourhoods
+                           with spatial joins and feature extraction
 """

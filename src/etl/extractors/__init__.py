@@ -6,4 +6,6 @@ various sources, including CSV files and potentially other formats.
 Classes:
     AutoTheftExtractor: Extracts auto theft data from raw CSV files
     CensusExtractor: Extracts Canada Census 2021 data with focus on Toronto FSAs
+    GeospatialExtractor: Extracts geospatial data for FSA and neighbourhoods
+                         from geojson files with spatial indexing
 """

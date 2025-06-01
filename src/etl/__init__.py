@@ -10,4 +10,5 @@ Modules:
     loaders: Data storage in processed formats
     auto_theft_pipeline: Main ETL pipeline orchestration for auto theft data
     census_pipeline: ETL pipeline orchestration for Canada Census 2021 data
+    geospatial_pipeline: ETL pipeline for FSA and neighbourhood spatial data
 """

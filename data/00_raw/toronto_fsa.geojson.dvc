@@ -1,0 +1,5 @@
+outs:
+- md5: 5c8aa59c175030fc238fcf61ad4de60b
+  size: 2836443
+  hash: md5
+  path: toronto_fsa.geojson

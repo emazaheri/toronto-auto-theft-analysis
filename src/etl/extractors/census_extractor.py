@@ -38,60 +38,93 @@ class CensusExtractor:
         )
 
     @retry((IOError, pd.errors.EmptyDataError), tries=3, delay=2.0)
-    def extract_geo_data(self) -> pd.DataFrame:
-        """Extract geographic index data for Toronto FSAs.
+    def calculate_row_indices(self) -> tuple[int, int]:
+        """Calculate the skiprows and nrows parameters for census data extraction.
+
+        Uses the geographic index data to determine which rows of the main
+        census file contain Toronto FSA data, significantly reducing memory usage.
 
         Returns:
-            DataFrame with geographic index information for Toronto FSAs
+            tuple: (nskiprows, nrows) where:
+                - nskiprows: Number of rows to skip from the start of the file
+                - nrows: Number of rows to read after skipping
 
         Raises:
-            FileNotFoundError: If the input file doesn't exist
+            FileNotFoundError: If the geographic index file doesn't exist
             IOError: If there's an error reading the file
             pd.errors.EmptyDataError: If the file is empty
         """
-        logger.info(f"Extracting geographic index data from {self.geo_input_path}")
+        logger.info(f"Calculating row indices from {self.geo_input_path}")
+
+        # Default values in case we can't calculate proper ones
+        default_skiprows = 0
+        default_nrows = 1000000  # Large enough to get all data
 
         if not os.path.exists(self.geo_input_path):
             logger.error(f"Geographic index file not found: {self.geo_input_path}")
-            raise FileNotFoundError(
-                f"Geographic index file not found: {self.geo_input_path}"
-            )
+            logger.warning("Using default row indices")
+            return default_skiprows, default_nrows
 
         try:
             # Read the geographic index file
             df_geo = pd.read_csv(self.geo_input_path)
 
-            # Filter for Toronto FSAs (those starting with 'M')
-            df_geo_filtered = df_geo[df_geo["Geo Name"].str.startswith(self.fsa_prefix)]
+            # Find rows where Geo Name starts with the FSA prefix
+            toronto_mask = df_geo["Geo Name"].str.startswith(self.fsa_prefix)
 
-            if df_geo_filtered.empty:
-                logger.warning(f"No Toronto FSAs found with prefix '{self.fsa_prefix}'")
+            if not toronto_mask.any():
+                logger.warning(f"No FSAs found with prefix '{self.fsa_prefix}'")
+                logger.warning("Using default row indices")
+                return default_skiprows, default_nrows
+
+            # Find the start line (first Toronto FSA)
+            start_line = df_geo[toronto_mask]["Line Number"].min()
+
+            # Find the end line (first FSA after Toronto)
+            next_fsa_group_char = chr(ord(self.fsa_prefix[0]) + 1)
+            next_fsa_mask = df_geo["Geo Name"].str.startswith(next_fsa_group_char)
+
+            if next_fsa_mask.any():
+                # Get the first line number where Geo Name starts with next character
+                end_line = df_geo[next_fsa_mask]["Line Number"].min()
             else:
-                logger.info(f"Extracted {len(df_geo_filtered)} Toronto FSAs")
+                # If no FSAs after Toronto, use the max line number + 1
+                end_line = df_geo[toronto_mask]["Line Number"].max() + 1
 
-            return df_geo_filtered
+            # Calculate skiprows and nrows
+            nskiprows = start_line - 1  # skip header and lines before Toronto
+            nrows = end_line - start_line  # number of Toronto rows
+
+            logger.info(
+                f"Row indices: start={start_line}, end={end_line}, "
+                f"skiprows={nskiprows}, nrows={nrows}"
+            )
+
+            return nskiprows, nrows
 
         except pd.errors.EmptyDataError:
             logger.error(f"Empty geographic index file: {self.geo_input_path}")
-            raise
+            logger.warning("Using default row indices")
+            return default_skiprows, default_nrows
         except OSError as e:
             logger.error(f"IOError while reading {self.geo_input_path}: {e}")
-            raise
+            logger.warning("Using default row indices")
+            return default_skiprows, default_nrows
         except Exception as e:
-            logger.exception(
-                f"Unexpected error while extracting geographic index data: {e}"
-            )
-            raise
+            logger.exception(f"Unexpected error while calculating row indices: {e}")
+            logger.warning("Using default row indices")
+            return default_skiprows, default_nrows
 
     @retry((IOError, pd.errors.EmptyDataError), tries=3, delay=2.0)
-    def extract_census_data(self, df_geo: pd.DataFrame) -> pd.DataFrame:
+    def extract_census_data(self, nskiprows: int, nrows: int) -> pd.DataFrame:
         """Extract census data for Toronto FSAs.
 
-        Uses the geographic index data to extract only the relevant rows
+        Uses the provided row indices to extract only the relevant rows
         from the main census file, significantly reducing memory usage.
 
         Args:
-            df_geo: DataFrame with geographic index information for Toronto FSAs
+            nskiprows: Number of rows to skip from the start of the file
+            nrows: Number of rows to read after skipping
 
         Returns:
             DataFrame with census data for Toronto FSAs
@@ -110,14 +143,6 @@ class CensusExtractor:
             )
 
         try:
-            # Calculate skiprows and nrows based on the geographic index data
-            nskiprows = df_geo["Line Number"].iloc[0]
-            nrows = df_geo["Line Number"].iloc[-1] - nskiprows + 1
-
-            logger.info(
-                f"Extracting census data rows {nskiprows + 1} to {nskiprows + nrows}"
-            )
-
             # Get original column names to map SYMBOL columns correctly
             original_columns = pd.read_csv(
                 self.data_input_path, nrows=0, encoding=self.encoding
@@ -143,7 +168,7 @@ class CensusExtractor:
                 self.data_input_path,
                 header=0,
                 encoding=self.encoding,
-                skiprows=range(1, nskiprows + 1),
+                skiprows=range(1, nskiprows),
                 nrows=nrows,
                 names=new_columns,
                 usecols=lambda x: x not in self.config["columns_to_drop"],
@@ -167,15 +192,15 @@ class CensusExtractor:
             raise
 
     def extract_data(self) -> pd.DataFrame:
-        """Extract both geographic and census data in one operation.
+        """Extract census data in one operation.
 
         Returns:
             DataFrame with census data for Toronto FSAs
         """
-        # First extract the geographic index data
-        df_geo = self.extract_geo_data()
+        # First calculate the row indices
+        nskiprows, nrows = self.calculate_row_indices()
 
-        # Then use it to extract the census data
-        df_census = self.extract_census_data(df_geo)
+        # Then extract the census data using those indices
+        df_census = self.extract_census_data(nskiprows, nrows)
 
         return df_census

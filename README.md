@@ -63,7 +63,7 @@ The project includes three ETL pipelines:
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/toronto-auto-theft-analysis.git
+git clone https://github.com/emazaheri/toronto-auto-theft-analysis.git
 cd toronto-auto-theft-analysis
 ```
 
@@ -71,6 +71,16 @@ cd toronto-auto-theft-analysis
 ```bash
 pip install -e .
 ```
+
+3. Configure DVC remote and pull raw data
+```bash
+# Add the S3 remote to DVC
+dvc remote add -d storage s3://toronto-theft-analysis-data-2025/data
+
+# Pull the data files
+dvc pull
+```
+This will retrieve all raw data files tracked by DVC from the remote storage. The raw data files are version-controlled using DVC and stored remotely to keep the Git repository lightweight.
 
 ## Running the ETL Pipelines
 
@@ -112,11 +122,3 @@ The analysis is documented in a series of Jupyter notebooks:
 2. `02_eda_census.ipynb` - Exploratory analysis of census data
 3. `03_fsa_to_neighborhood.ipynb` - Mapping FSAs to Toronto neighborhoods
 4. `04_joint_theft_census_analysis.ipynb` - Combined analysis of theft and demographic factors
-
-## License
-
-[Add your license information here]
-
-## Contributors
-
-[Add contributor information here]

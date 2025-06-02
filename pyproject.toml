@@ -15,6 +15,7 @@ dependencies = [
 # --- dependencies for development, visualization, and the app ---
 [project.optional-dependencies]
 dev = [
+    "ipykernel",  # For Jupyter kernel support
     "ruff",
     "dvc[s3]", # For data versioning
     "awscli", # For AWS CLI commands
@@ -22,6 +23,7 @@ dev = [
     "pytest",      # For testing
 ]
 viz = [
+    "quarto>=0.1.0",
     "plotly",
     "matplotlib",
     "seaborn",

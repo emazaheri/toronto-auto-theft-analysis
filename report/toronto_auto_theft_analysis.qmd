@@ -1,5 +1,5 @@
 ---
-title: "Toronto Auto Theft Analysis: Insurance Risk Assessment and Premium Optimization"
+title: "Toronto Auto Theft Analysis"
 author: "Ehsan Mazaheri"
 date: "June 1, 2025"
 format:
@@ -45,7 +45,6 @@ The analysis addresses the key challenge of integrating datasets with different 
   - Temporal: REPORT_DATE, OCC_DATE and their components (year, month, day, hour)
   - Geospatial: AREA_CODE, NEIGHBOURHOOD_158, HOOD_158, LAT_WGS84, LONG_WGS84
   - Categorical: LOCATION_TYPE (e.g., Parking Lot, Street), PREMISES_TYPE (e.g., Commercial, Residential)
-  - Insurance-relevant: Claim processing time, recovery status (where available)
 
 ### Census Data
 - Source: Statistics Canada 2021 Census [@statcan_2021]
@@ -69,10 +68,10 @@ The analysis addresses the key challenge of integrating datasets with different 
 A robust ETL (Extract, Transform, Load) pipeline was developed to process and integrate the datasets, structured as a Python package with modular components:
 
 1. **Auto Theft Pipeline** (`auto_theft_pipeline.py`)
-   - Cleaned and validated insurance claim incident data
+   - Cleaned and validated data
    - Standardized temporal information (fixed inconsistent timestamps)
    - Verified geospatial coordinates (ensured all coordinates fall within Toronto's boundaries)
-   - Generated derived features (time bins, seasons, weekend indicators) for insurance risk modeling
+   - Generated derived features (time bins, seasons, weekend indicators) for possible future insurance risk modeling
    - Masked sensitive claimant information while preserving analytical value
 
 2. **Census Pipeline** (`census_pipeline.py`)
@@ -93,7 +92,7 @@ A robust ETL (Extract, Transform, Load) pipeline was developed to process and in
    - Removed duplicate claim entries (reduced from 68,063 to 61,534 unique events)
    - Fixed timestamp issues (all original timestamps were set to 05:00:00; replaced with hour values from separate columns)
    - Validated geographic coordinates (ensuring latitude between 43.5-44.0, longitude between -79.8-79.0)
-   - Imputed missing neighborhood information using modal neighborhoods for each insurance service area
+   - Imputed missing neighborhood information using modal neighborhoods
    - Dropped 363 records (~0.5%) with no usable geospatial information
    - Removed 19 events with occurrence dates significantly earlier than the claim reporting period
    - Standardized categorical variables using category data types
@@ -464,7 +463,7 @@ All analysis code and data processing pipelines for this report are available in
    - Join datasets on neighborhood ID
    - Calculate per capita rates for standardization
 
-### Validation and Insurance Standards Compliance
+### Validation
 
 - **Coordinate Validation**: All claim coordinates were verified to be within Toronto's boundaries (latitude 43.5-44.0, longitude -79.8-79.0) to ensure accurate territorial rating.
 
@@ -473,7 +472,5 @@ All analysis code and data processing pipelines for this report are available in
 - **Duplicate Claim Detection**: Multiple methods were used to identify and resolve duplicate claim records to prevent double-counting.
 
 - **Imputation Validation**: Imputed values were checked against known patterns and geographic logic to maintain rating equity.
-
-- **Actuarial Data Quality Standards**: All data processing followed OSFI (Office of the Superintendent of Financial Institutions) and IBC (Insurance Bureau of Canada) guidelines for statistical credibility.
 
 - **Rating Territory Verification**: Maps were generated to visually confirm complete coverage of Toronto's area with appropriate risk differentiation between territories.
